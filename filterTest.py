@@ -66,6 +66,6 @@ readfile()
 #print("2 - Secondary Schools")
 
 typesort = input("Enter text to filter by:")
-filterByString(typesort)
+filterByString(typesort)    #'typesort' is the filter text
 #filterbyLevel(typesort)
 
