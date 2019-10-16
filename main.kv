@@ -1,0 +1,179 @@
+#:import Factory kivy.factory.Factory
+<RootWidget>:
+    on_parent: root.on_load()
+    txtsearch:search_sch_textinput
+    guimap: gui_map
+    menu_scroll: menu_scroll
+    level_spinner: level_spinner
+    region_spinner: region_spinner
+    lbl_results_count: lbl_results_count
+    canvas:
+        Color:
+            rgba: rgba('#ffffff')
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    #Map
+    AnchorLayout:
+        anchor_x: 'right'
+        anchor_y: 'bottom'
+        BoxLayout:
+            size_hint: (0.75, 0.9)
+            MapView:
+                lon: 103.8198
+                lat: 1.3521
+                zoom: 12
+                id: gui_map
+            Button:
+                text: 'FAVOURITE'
+                size_hint: (0.5, 0.5)
+    #Left menu bar
+    AnchorLayout:
+        anchor_x: 'left'
+        anchor_y: 'bottom'
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: (0.25, 0.9)
+            padding: (20, 10, 20, 0)
+            spacing: 10
+            canvas:
+                Color:
+                    rgba: rgba('#f8bd36')
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            Label:
+                id: lbl_results_count
+                size_hint: None, None
+                size: self.texture_size
+                color: rgba('#000000')
+            ScrollView:
+                id: menu_scroll
+                scroll_type: ['bars', 'content']
+                bar_width: 10
+                scroll_wheel_distance: 80
+                bar_color: rgba('#c7c7c7')
+    #Left menu bar top
+    AnchorLayout:
+        anchor_x: 'left'
+        anchor_y: 'top'
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: (0.25, 0.1)
+            padding: (20, 0, 20, 10)
+            spacing: 5
+            canvas:
+                Color:
+                    rgba: rgba('#f5ae31')
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            Label:
+                text: 'SEARCH'
+                text_size: self.size
+                color: rgba('#000000')
+            TextInput:
+                background_color: rgba('#ef9328')
+                hint_text: 'Find a school'
+                hint_text_color: rgba('#ffffff')
+                foreground_color: rgba('#ffffff')
+                cursor_color: rgba('#000000')
+                multiline: False
+                on_text_validate: root.on_enter()
+                id: search_sch_textinput
+    #Grey menu bar
+    AnchorLayout:
+        anchor_x: 'right'
+        anchor_y: 'top'
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: (0.75, 0.1)
+            spacing: 3
+            canvas:
+                Color:
+                    rgba: rgba('#b8b8b8')
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            BoxLayout:
+                orientation: 'vertical'
+                padding: (20, 0, 20, 10)
+                spacing: 5
+                canvas:
+                    Color:
+                        rgba: rgba('#cecece')
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                Label:
+                    text: 'EDUCATION LEVEL'
+                    text_size: self.size
+                    color: rgba('#000000')
+                Spinner:
+                    canvas.before:
+                        Color:
+                            rgba: rgba('#ededed')
+                        Line:
+                            width: 2
+                            rectangle: self.x, self.y, self.width, self.height
+                    color: rgba('#000000')
+                    background_normal: ''
+                    background_color: rgba('#cecece')
+                    text: 'PRIMARY'
+                    values: 'PRIMARY', 'SECONDARY', 'JUNIOR COLLEGE', 'CENTRALISED INSTITUTE', 'MIXED LEVEL'
+                    id: level_spinner
+                    on_text: root.scroll_view_load()
+            BoxLayout:
+                orientation: 'vertical'
+                padding: (20, 0, 20, 10)
+                spacing: 5
+                canvas:
+                    Color:
+                        rgba: rgba('#cecece')
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                Label:
+                    text: 'NEAR LOCATION'
+                    text_size: self.size
+                    color: rgba('#000000')
+                Spinner:
+                    canvas.before:
+                        Color:
+                            rgba: rgba('#ededed')
+                        Line:
+                            width: 2
+                            rectangle: self.x, self.y, self.width, self.height
+                    color: rgba('#000000')
+                    background_normal: ''
+                    background_color: rgba('#cecece')
+                    text: 'NORTH'
+                    values: 'NORTH', 'SOUTH', 'EAST', 'WEST'
+                    id: region_spinner
+                    on_text: root.scroll_view_load()
+            BoxLayout:
+                orientation: 'vertical'
+                padding: (20, 0, 20, 10)
+                spacing: 5
+                canvas:
+                    Color:
+                        rgba: rgba('#cecece')
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                Label:
+                    text: 'CCAs'
+                    text_size: self.size
+                    color: rgba('#000000')
+                Button:
+                    canvas.before:
+                        Color:
+                            rgba: rgba('#ededed')
+                        Line:
+                            width: 2
+                            rectangle: self.x, self.y, self.width, self.height
+                    color: rgba('#000000')
+                    background_normal: ''
+                    background_color: rgba('#cecece')
+                    text: 'None Selected'
+                    on_release: root.cca_popup()
