@@ -48,6 +48,22 @@ def cords_from_postal(p_code):
     lat = cords_data.loc[index_no, "Latitude"]
     lon = cords_data.loc[index_no, "Longitude"]
     return [float(lat), float(lon)]
+
+
+def get_closest_pcode(pcode):
+    code = pcode
+    closest_up = pcode
+    closest_down = pcode
+    while code not in list(cords_data['postal_code']): #uses next closest available postal code
+        closest_up += 1
+        closest_down -= 1
+        if closest_up in list(cords_data['postal_code']):
+            code = closest_up
+        elif closest_down in list(cords_data['postal_code']):
+            code = closest_down
+    return code
+
+
 def distance_calc_all(start_code):
     """
     Updates main dataframe with distance to all schools as new column
@@ -68,23 +84,18 @@ def distance_calc_all(start_code):
         sch_data_dict[i][3] = round(geodesic(cords_from_postal(start_code),
                                              (sch_data_dict[i][1],sch_data_dict[i][2])).km, 2)
 def is_it_near(max_distance):
-    new_dict = {}
     sch_list = []
     dist_list = []
-    for i in sch_data_dict:
-        if sch_data_dict[i][3] <= max_distance:
-            sch_data_dict[i][4] = True
-            new_dict[i] = sch_data_dict[i]
-            new_dict[i][0] = sch_data_dict[i][0]
-            new_dict[i][1] = sch_data_dict[i][1]
-            new_dict[i][2] = sch_data_dict[i][2]
-            new_dict[i][3] = sch_data_dict[i][3]
-            new_dict[i][4] = sch_data_dict[i][4]
-            sch_list.append(i)
-            dist_list.append(sch_data_dict[i][3])
-        elif max_distance == 0:
-            sch_data_dict[i][4] = True
-        else:
+    if max_distance > 0:
+        for i in sch_data_dict:
+            if sch_data_dict[i][3] <= max_distance:
+                sch_data_dict[i][4] = True
+                sch_list.append(i)
+                dist_list.append(sch_data_dict[i][3])
+            elif sch_data_dict[i][3] > max_distance:
+                sch_data_dict[i][4] = False
+    elif max_distance == 0:
+        for i in sch_data_dict:
             sch_data_dict[i][4] = False
     to_return = sort_two_lists_2gd(dist_list,sch_list)
     return to_return[0], to_return[1]

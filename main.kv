@@ -10,6 +10,8 @@
     pcode: pcode
     radius: radius
     isnear: isnear
+    btn_viewFav: btn_viewFav
+    btnCCA: btnCCA
     canvas:
         Color:
             rgba: rgba('#ffffff')
@@ -27,9 +29,14 @@
                 lat: 1.3521
                 zoom: 12
                 id: gui_map
+    FloatLayout:
+        AnchorLayout:
+            anchor_x: 'right'
+            anchor_y: 'bottom'
+            padding: (0, 0, 20, 20)
             Button:
+                size_hint:(0.1, 0.1)
                 text: 'View Favorites'
-                size_hint: (0.5, 0.5)
                 on_release: root.viewFavoritesList()
                 id: btn_viewFav
     #Left menu bar
@@ -93,7 +100,7 @@
                 foreground_color: rgba('#ffffff')
                 cursor_color: rgba('#000000')
                 multiline: False
-                on_text: root.on_enter(), root.scroll_view_load()
+                on_text: root.scroll_view_load()
                 id: pcode
                 disabled: True
             BoxLayout:
@@ -108,7 +115,7 @@
                     foreground_color: rgba('#ffffff')
                     cursor_color: rgba('#000000')
                     multiline: False
-                    on_text_validate: root.on_enter(), root.scroll_view_load()
+                    on_text_validate: root.scroll_view_load()
                     id: radius
                     disabled: True
                 BoxLayout:
@@ -119,7 +126,7 @@
                     CheckBox:
                         size_hint_x: 0.1
                         id: isnear
-                        on_active: root.enableDistanceFilter(), root.scroll_view_load(), root.on_enter()
+                        on_active: root.enableDistanceFilter(), root.scroll_view_load()
                         color: rgba('#000000')
 
 
@@ -218,4 +225,5 @@
                     background_normal: ''
                     background_color: rgba('#cecece')
                     text: 'None Selected'
+                    id: btnCCA
                     on_release: root.cca_popup()
