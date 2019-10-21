@@ -7,6 +7,10 @@
     level_spinner: level_spinner
     region_spinner: region_spinner
     lbl_results_count: lbl_results_count
+    pcode: pcode
+    radius: radius
+    isnear: isnear
+    btn_viewFav: btn_viewFav
     canvas:
         Color:
             rgba: rgba('#ffffff')
@@ -24,16 +28,23 @@
                 lat: 1.3521
                 zoom: 12
                 id: gui_map
+    FloatLayout:
+        AnchorLayout:
+            anchor_x: 'right'
+            anchor_y: 'bottom'
+            padding: (0, 0, 20, 20)
             Button:
-                text: 'FAVOURITE'
-                size_hint: (0.5, 0.5)
+                size_hint:(0.1, 0.1)
+                text: 'View Favorites'
+                on_release: root.viewFavoritesList()
+                id: btn_viewFav
     #Left menu bar
     AnchorLayout:
         anchor_x: 'left'
         anchor_y: 'bottom'
         BoxLayout:
             orientation: 'vertical'
-            size_hint: (0.25, 0.9)
+            size_hint: (0.25, 0.8)
             padding: (20, 10, 20, 0)
             spacing: 10
             canvas:
@@ -59,7 +70,7 @@
         anchor_y: 'top'
         BoxLayout:
             orientation: 'vertical'
-            size_hint: (0.25, 0.1)
+            size_hint: (0.25, 0.2)
             padding: (20, 0, 20, 10)
             spacing: 5
             canvas:
@@ -81,6 +92,43 @@
                 multiline: False
                 on_text_validate: root.on_enter()
                 id: search_sch_textinput
+            TextInput:
+                background_color: rgba('#ef9328')
+                hint_text: 'Your postal code'
+                hint_text_color: rgba('#ffffff')
+                foreground_color: rgba('#ffffff')
+                cursor_color: rgba('#000000')
+                multiline: False
+                on_text: root.scroll_view_load()
+                id: pcode
+                disabled: True
+            BoxLayout:
+                orientation: 'horizontal'
+                size_hint: (1, 1)
+                padding: (0, 0, 0, 0)
+                spacing: 5
+                TextInput:
+                    background_color: rgba('#ef9328')
+                    hint_text: 'Max distance (km)'
+                    hint_text_color: rgba('#ffffff')
+                    foreground_color: rgba('#ffffff')
+                    cursor_color: rgba('#000000')
+                    multiline: False
+                    on_text_validate: root.scroll_view_load()
+                    id: radius
+                    disabled: True
+                BoxLayout:
+                    padding: (20,0,20,0)
+                    Label:
+                        text: 'Toggle Distance Filter:'
+                        color: rgba('#000000')
+                    CheckBox:
+                        size_hint_x: 0.1
+                        id: isnear
+                        on_active: root.enableDistanceFilter(), root.scroll_view_load()
+                        color: rgba('#000000')
+
+
     #Grey menu bar
     AnchorLayout:
         anchor_x: 'right'
@@ -119,8 +167,8 @@
                     color: rgba('#000000')
                     background_normal: ''
                     background_color: rgba('#cecece')
-                    text: 'PRIMARY'
-                    values: 'PRIMARY', 'SECONDARY', 'JUNIOR COLLEGE', 'CENTRALISED INSTITUTE', 'MIXED LEVEL'
+                    text: 'ALL'
+                    values: 'ALL', 'PRIMARY', 'SECONDARY', 'JUNIOR COLLEGE', 'CENTRALISED INSTITUTE', 'MIXED LEVEL'
                     id: level_spinner
                     on_text: root.scroll_view_load()
             BoxLayout:
@@ -147,33 +195,54 @@
                     color: rgba('#000000')
                     background_normal: ''
                     background_color: rgba('#cecece')
-                    text: 'NORTH'
-                    values: 'NORTH', 'SOUTH', 'EAST', 'WEST'
+                    text: 'ALL'
+                    values: 'ALL', 'NORTH', 'SOUTH', 'EAST', 'WEST'
                     id: region_spinner
                     on_text: root.scroll_view_load()
-            BoxLayout:
-                orientation: 'vertical'
-                padding: (20, 0, 20, 10)
-                spacing: 5
-                canvas:
-                    Color:
-                        rgba: rgba('#cecece')
-                    Rectangle:
-                        pos: self.pos
-                        size: self.size
-                Label:
-                    text: 'CCAs'
-                    text_size: self.size
-                    color: rgba('#000000')
-                Button:
-                    canvas.before:
-                        Color:
-                            rgba: rgba('#ededed')
-                        Line:
-                            width: 2
-                            rectangle: self.x, self.y, self.width, self.height
-                    color: rgba('#000000')
-                    background_normal: ''
-                    background_color: rgba('#cecece')
-                    text: 'None Selected'
-                    on_release: root.cca_popup()
+
+
+<LoadDialog>:
+    BoxLayout:
+        size: root.size
+        pos: root.pos
+        orientation: "vertical"
+        FileChooserIconView:
+            id: filechooser
+
+        BoxLayout:
+            size_hint_y: None
+            height: 30
+            Button:
+                text: "Cancel"
+                on_release: root.cancel()
+
+            Button:
+                text: "Load"
+                on_release: root.load(filechooser.path, filechooser.selection)
+
+<SaveDialog>:
+    text_input: text_input
+    BoxLayout:
+        size: root.size
+        pos: root.pos
+        orientation: "vertical"
+        FileChooserIconView:
+            id: filechooser
+            on_selection: text_input.text = self.selection and self.selection[0] or ''
+
+        TextInput:
+            id: text_input
+            size_hint_y: None
+            height: 30
+            multiline: False
+
+        BoxLayout:
+            size_hint_y: None
+            height: 30
+            Button:
+                text: "Cancel"
+                on_release: root.cancel()
+
+            Button:
+                text: "Save"
+                on_release: root.save(filechooser.path, text_input.text)

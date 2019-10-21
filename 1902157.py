@@ -1,119 +1,191 @@
-import csv,\
-    sys, re
-
-Subjects_offered, Subjectsls = {}, []
-Menu = {0: "Exit", 1: "Read data info from dataset", 2: "Show all the result", 3: "Search by exact school name",
-        4: "Search school that contains the following word",
-        5: "Display all the subject offer", 6: "Search school that offer the subject search"}
+import csv
+import sys
 
 
-def displaymenu():  # This function display the item in menu
-    for i in range(1, len(Menu) + 1):
-        if i == len(Menu):
-            i = 0
-            print(i, Menu[i])
-            return
-        else:
-            print(i, Menu[i])
+def copyall(filename, datasetnumber):
+    if datasetnumber == 1:
+        ifile = open('co-curricular-activities-ccas.csv', "rb")
+        reader = csv.DictReader(ifile)
+        ofile = open(filename, "wb")
+        writer = csv.DictWriter(ofile, fieldnames=reader.fieldnames)
+
+        writer.writeheader()
+
+        for row in reader:
+            writer.writerow(row)
+
+        ifile.close()
+        ofile.close()
+
+        print "The chosen dataset has been successfully exported to the following file:" + filename
 
 
-def readfile():  # This function is to open the file and with read access
-    # filename= input("Enter the file name: ")
-    filename = "subjects-offered.csv"
-    datasetsubjectoffer(filename)
+    elif datasetnumber == 2:
+        ifile = open('general-information-of-schools.csv', "rb")
+        reader = csv.DictReader(ifile)
+        ofile = open(filename, "wb")
+        writer = csv.DictWriter(ofile, fieldnames=reader.fieldnames)
+
+        writer.writeheader()
+
+        for row in reader:
+            writer.writerow(row)
+
+        ifile.close()
+        ofile.close()
+
+        print "The chosen dataset has been successfully exported to the following file:" + filename
+
+    elif datasetnumber == 3:
+        ifile = open('subjects-offered.csv', "rb")
+        reader = csv.DictReader(ifile)
+        ofile = open(filename, "wb")
+        writer = csv.DictWriter(ofile, fieldnames=reader.fieldnames)
+
+        writer.writeheader()
+
+        for row in reader:
+            writer.writerow(row)
+
+        ifile.close()
+        ofile.close()
+
+        print "The chosen dataset has been successfully exported to the following file:" + filename
 
 
-def datasetsubjectoffer(filename):
-    recordcnt = 0
-    with open(filename, mode='r') as csv_file:
-        csv_reader = csv.reader(csv_file)
-        for data in csv_reader:
-            if data[0] != 'school_name':
-                recordcnt += 1
-                if data[0] in Subjects_offered.keys():
-                    Subjects_offered[data[0]].append(data[1])
+def copycertain(filename, datasetnumber, schoolipt):
+    s1 = schoolipt.upper()
+    success = 0
+
+    if datasetnumber == 1:
+        with open("co-curricular-activities-ccas.csv", "rb") as f:
+            reader = csv.DictReader(f, delimiter=',')
+            with open(filename, "wb") as f_out:
+                writer = csv.DictWriter(f_out, fieldnames=reader.fieldnames, delimiter=",")
+                writer.writeheader()
+                for row in reader:
+                    if row['school_name'] == s1:
+                        writer.writerow(row)
+                        success = len(row)
+
+            if success == 0:
+                print "The school you've entered is not found in our dataset."
+                tryagain = int(input("Would you like to try again? 1 = Yes, 2 = No"))
+
+                if tryagain == 1:
+                    export()
+
                 else:
-                    Subjects_offered[data[0]] = [data[1]]
-                if data[1] not in Subjectsls:
-                    Subjectsls.append(data[1])
-    print('%s %d' % ('Total record: ', recordcnt))
+                    sys.exit()
+
+            else:
+                print "The chosen dataset has been successfully exported to the following file:" + filename
 
 
-def sortAZZA(dic, typesort):  # Print subject offer by the order A-Z or Z-A
-    schcnt = 0
-    if typesort == 0:
-        for key in sorted(dic):
-            schcnt += 1
-            print ('%s:%s \n' % (key, dic[key]))
-        print ('Total School %d .' % (schcnt))
-    elif typesort == 1:
-        for key in sorted(dic, reverse=True):
-            schcnt += 1
-            print ('%s:%s \n' % (key, dic[key]))
-        print ('Total School %d .' % (schcnt))
+
+    elif datasetnumber == 2:
+        s1 = schoolipt.upper()
+        success = 0
+
+        with open("general-information-of-schools.csv", "rb") as f:
+                reader = csv.DictReader(f, delimiter=',')
+                with open(filename, "wb") as f_out:
+                    writer = csv.DictWriter(f_out, fieldnames=reader.fieldnames, delimiter=",")
+                    writer.writeheader()
+                    for row in reader:
+                        if row['school_name'] == s1:
+                            writer.writerow(row)
+                            success = len(row)
+
+                if success == 0:
+                    print "The school you've entered is not found in our dataset."
+                    tryagain = int(input("Would you like to try again? 1 = Yes, 2 = No"))
+
+                    if tryagain == 1:
+                        export()
+
+                    else:
+                        sys.exit()
+
+                else:
+                    print "The chosen dataset has been successfully exported to the following file:" + filename
+
+    elif datasetnumber == 3:
+        s1 = schoolipt.upper()
+        success = 0
+
+        with open("subjects-offered.csv", "rb") as f:
+                reader = csv.DictReader(f, delimiter=',')
+                with open(filename, "wb") as f_out:
+                    writer = csv.DictWriter(f_out, fieldnames=reader.fieldnames, delimiter=",")
+                    writer.writeheader()
+                    for row in reader:
+                        if row['school_name'] == s1:
+                            writer.writerow(row)
+                            success = len(row)
+
+                if success == 0:
+                    print "The school you've entered is not found in our dataset."
+                    tryagain = int(input("\nWould you like to try again? 1 = Yes, 2 = No\n"))
+
+                    if tryagain == 1:
+                        export()
+
+                    else:
+                        sys.exit()
+
+                else:
+                    print "The chosen dataset has been successfully exported to the following file:" + filename
+                    sys.exit()
+
+def export():
+
+    print "\n1. Co-Curricular Activities \n2. General Information of Schools \n3. Subjects Offered from Schools "
+
+
+    try:
+        datasetnumber = int(input("\nWhich data set would you like to export from? "))
+
+
+    except:
+        print "\nYou have entered an invalid input. Please try again\n"
+        export()
+
+    if (datasetnumber == 1) or (datasetnumber == 2) or (datasetnumber == 3):
+
+            fe = raw_input("\nSet the export filename: ")
+
+            if set('[~!@#$%^&*()_+{}":;\']+$').intersection(fe):
+                print "\nPlease enter only characters or numbers. The program will restart again.\n"
+                export()
+
+            else:
+                filename = fe + '.csv'
+
+                print "\n1. Entire Dataset \n2. Search By Specific School"
+
+                try:
+                    specificornah = int(input("\nWould you like to copy the entire dataset or only for a specific school?"))
+
+                except:
+                    print "\nYou have entered an invalid input. Please try again\n"
+                    export()
+
+                if specificornah == 1:
+                    copyall(filename, datasetnumber)
+
+                elif specificornah == 2:
+                    schoolipt = raw_input("\nPlease type in the name of the school: \n")
+                    copycertain(filename, datasetnumber, schoolipt)
+
+                else:
+                    print "\nYou have entered an invalid input. Please try again\n"
+                    export()
+
     else:
-        print('You choose an invaild sort vaule !!! Either 0 or 1')
-
-
-def SearchSchool(dic, school):
-    if school in dic.keys():
-        print ('%s:%s \n' % (school, dic[school]))
-    else:
-        print ('No result found.')
-
-
-def SearchSchoolContainSubString(dic, patten):
-    schcnt = 0
-    # patten = 'SECONDARY SCHOOL'
-    for key in dic.keys():
-        if re.findall(patten, key):
-            schcnt += 1
-            print ('%s:%s \n' % (key, dic[key]))
-    print ('Total School found %d base on your search.' % (schcnt))
-
-
-def SearchSubject(dic, subject):
-    Subjectcnt = 0
-    # patten = 'SECONDARY SCHOOL'
-    for key in sorted(dic):
-        # print Subjects_offered[key]
-        if subject in dic[key]:
-            Subjectcnt += 1
-            print ('%s \n' % key)
-    print ('Total School found %d base on your search subject offer.' % (Subjectcnt))
-
-
-def displaysubject():
-    for i in Subjectsls:
-        print (i)
-
-def export(filename,list):
-    with open("output.csv", "wb") as f:
-        writer = csv.writer(f)
-        writer.writerows(list)
+        print "\nYou have entered an invalid input. Please try again\n"
+        export()
 
 
 
-while True:
-    displaymenu()
-    option = int(input('Enter your option:'))
-    if option == 0:
-        exit()
-    elif option == 1:
-        readfile()
-    elif option == 2:
-        typesort = input('Enter 0 (if you perfer sort A-Z) or 1 (if you perfer sort Z-A)')
-        sortAZZA(Subjects_offered, typesort)
-    elif option == 3:
-        school = raw_input('Enter the exactly school name you wish to search: ')
-        SearchSchool(Subjects_offered, school.upper())
-    elif option == 4:
-        patten = raw_input('Enter anything contain in school name: ')
-        SearchSchoolContainSubString(Subjects_offered, patten.upper())
-    elif option == 5:
-        displaysubject()
-    elif option == 6:
-        subject = raw_input('Enter the subject wish to search: ')
-        SearchSubject(Subjects_offered, subject.upper())
-    else:
-        print('Invaild option')
+export()
