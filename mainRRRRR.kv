@@ -1,0 +1,178 @@
+#:import Factory kivy.factory.Factory
+<RootWidget>:
+    txtsearch:search_sch_textinput
+    pcode: search_sch_pcode
+    radius: search_sch_radius
+    guimap: gui_map
+    canvas:
+        Color:
+            rgba: rgba('#ffffff')
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    #Map
+    AnchorLayout:
+        anchor_x: 'right'
+        anchor_y: 'bottom'
+        BoxLayout:
+            size_hint: (0.75, 0.9)
+            MapView:
+                lon: 103.8198
+                lat: 1.3521
+                zoom: 12
+                double_tap_zoom: True
+                id: gui_map
+    #Left menu bar
+    AnchorLayout:
+        anchor_x: 'left'
+        anchor_y: 'bottom'
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: (0.25, 0.9)
+            canvas:
+                Color:
+                    rgba: rgba('#f8bd36')
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+    #Left menu bar top
+    AnchorLayout:
+        anchor_x: 'left'
+        anchor_y: 'top'
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: (0.25, 0.1)
+            padding: (20, 0, 20, 10)
+            spacing: 5
+            canvas:
+                Color:
+                    rgba: rgba('#f5ae31')
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            Label:
+                text: 'SEARCH'
+                text_size: self.size
+                color: rgba('#000000')
+            BoxLayout:
+                spacing: 10
+                TextInput:
+                    background_color: rgba('#ef9328')
+                    hint_text: 'Search School'
+                    hint_text_color: rgba('#ffffff')
+                    foreground_color: rgba('#ffffff')
+                    cursor_color: rgba('#000000')
+                    multiline: False
+                    on_text_validate: root.on_enter()
+                    id: search_sch_textinput
+                TextInput:
+                    background_color: rgba('#ef9328')
+                    hint_text: 'Home Postal Code'
+                    hint_text_color: rgba('#ffffff')
+                    foreground_color: rgba('#ffffff')
+                    cursor_color: rgba('#000000')
+                    multiline: False
+                    on_text_validate: root.on_enter()
+                    id: search_sch_pcode
+                TextInput:
+                    background_color: rgba('#ef9328')
+                    hint_text: 'Max Distance'
+                    hint_text_color: rgba('#ffffff')
+                    foreground_color: rgba('#ffffff')
+                    cursor_color: rgba('#000000')
+                    multiline: False
+                    on_text_validate: root.on_enter()
+                    id: search_sch_radius
+
+    #Grey menu bar
+    AnchorLayout:
+        anchor_x: 'right'
+        anchor_y: 'top'
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: (0.75, 0.1)
+            spacing: 3
+            canvas:
+                Color:
+                    rgba: rgba('#b8b8b8')
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            BoxLayout:
+                orientation: 'vertical'
+                padding: (20, 0, 20, 10)
+                spacing: 5
+                canvas:
+                    Color:
+                        rgba: rgba('#cecece')
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                Label:
+                    text: 'EDUCATION LEVEL'
+                    text_size: self.size
+                    color: rgba('#000000')
+                Spinner:
+                    canvas.before:
+                        Color:
+                            rgba: rgba('#ededed')
+                        Line:
+                            width: 2
+                            rectangle: self.x, self.y, self.width, self.height
+                    color: rgba('#000000')
+                    background_normal: ''
+                    background_color: rgba('#cecece')
+                    text: 'Primary'
+                    values: 'Primary', 'Secondary', 'Junior College'
+            BoxLayout:
+                orientation: 'vertical'
+                padding: (20, 0, 20, 10)
+                spacing: 5
+                canvas:
+                    Color:
+                        rgba: rgba('#cecece')
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                Label:
+                    text: 'NEAR LOCATION'
+                    text_size: self.size
+                    color: rgba('#000000')
+                Spinner:
+                    canvas.before:
+                        Color:
+                            rgba: rgba('#ededed')
+                        Line:
+                            width: 2
+                            rectangle: self.x, self.y, self.width, self.height
+                    color: rgba('#000000')
+                    background_normal: ''
+                    background_color: rgba('#cecece')
+                    text: 'North'
+                    values: 'North', 'South', 'East', 'West'
+            BoxLayout:
+                orientation: 'vertical'
+                padding: (20, 0, 20, 10)
+                spacing: 5
+                canvas:
+                    Color:
+                        rgba: rgba('#cecece')
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                Label:
+                    text: 'CCAs'
+                    text_size: self.size
+                    color: rgba('#000000')
+                Button:
+                    canvas.before:
+                        Color:
+                            rgba: rgba('#ededed')
+                        Line:
+                            width: 2
+                            rectangle: self.x, self.y, self.width, self.height
+                    color: rgba('#000000')
+                    background_normal: ''
+                    background_color: rgba('#cecece')
+                    text: 'None Selected'
+                    on_release: root.on_popup_load()
