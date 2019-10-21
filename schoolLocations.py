@@ -14,7 +14,6 @@ Call is_it_near(<max distance>) to update [4] (only after updating [3])
 """
 import pandas as pd
 from geopy.distance import geodesic
-from collections import OrderedDict
 
 # importing CSV files
 sch_data = pd.read_csv('general-information-of-schools.csv', usecols=['school_name', 'postal_code', 'zone_code',
@@ -22,19 +21,12 @@ sch_data = pd.read_csv('general-information-of-schools.csv', usecols=['school_na
 cords_data = pd.read_csv("geonames-coordinates.csv", usecols=['postal_code', 'Latitude', 'Longitude'])
 cca_data = pd.read_csv("co-curricular-activities-ccas.csv", usecols=['school_name', 'cca_grouping_desc',
                                                                   'cca_generic_name'])
-# subjects_data = pd.read_csv("subjects-offered.csv", usecols=['school_name', 'subject_desc'])
 
 # joining some columns and rows together
-# cca_data_grouped = cca_data.groupby(['school_name', 'cca_grouping_desc'])['cca_generic_name'].apply(', '.join).reset_index()
 cca_data = cca_data.groupby(['school_name'])['cca_generic_name'].apply(', '.join).reset_index()
-# cca_data_groups = cca_data_grouped.groupby(['school_name'])['cca_grouping_desc'].apply(', '.join).reset_index()
-# subjects_data = subjects_data.groupby(['school_name'])['subject_desc'].apply(', '.join).reset_index()
 
 # combining data to main data
 sch_data = sch_data.merge(cords_data, on="postal_code", how='left').fillna(0)  # adds coordinates to main data
-# sch_data = sch_data.merge(subjects_data, on="school_name", how='left').fillna(0)  # adds subjects to main data
-# sch_data = sch_data.merge(cca_data_groups, on="school_name", how='left').fillna(0)  # adds cca groups to main data
-# sch_data = sch_data.merge(cca_data_all, on="school_name", how='left').fillna(0)  # adds actual ccas to main data
 
 sch_data_dict = {}
 
@@ -51,16 +43,21 @@ def cords_from_postal(p_code):
 
 
 def get_closest_pcode(pcode):
+    """
+    For when user's postal code is not in database, next closest available postal code is used
+    """
     code = pcode
     closest_up = pcode
     closest_down = pcode
-    while code not in list(cords_data['postal_code']): #uses next closest available postal code
+    while code not in list(cords_data['postal_code']):  # uses next closest available postal code
         closest_up += 1
         closest_down -= 1
         if closest_up in list(cords_data['postal_code']):
             code = closest_up
         elif closest_down in list(cords_data['postal_code']):
             code = closest_down
+    if pcode != code:
+        print '{} not found, used next closest available postal code: {}'.format(pcode, code)
     return code
 
 
@@ -68,22 +65,17 @@ def distance_calc_all(start_code):
     """
     Updates main dataframe with distance to all schools as new column
     """
-    closest_up = start_code
-    closest_down = start_code
-    ori_code = start_code
-    while start_code not in list(cords_data['postal_code']): #uses next closest available postal code
-        closest_up += 1
-        closest_down -= 1
-        if closest_up in list(cords_data['postal_code']):
-            start_code = closest_up
-        elif closest_down in list(cords_data['postal_code']):
-            start_code = closest_down
-    if start_code != ori_code:
-        print '{} not found, used next closest available postal code: {}'.format(ori_code, start_code)
+    start_code = get_closest_pcode(start_code)
     for i in sch_data_dict:
         sch_data_dict[i][3] = round(geodesic(cords_from_postal(start_code),
                                              (sch_data_dict[i][1],sch_data_dict[i][2])).km, 2)
+
+
 def is_it_near(max_distance):
+    """
+    Changes a boolean value of dictionary if to indicate if the school is
+    near/far from a postal code based on a given maximum distance
+    """
     sch_list = []
     dist_list = []
     if max_distance > 0:
@@ -119,6 +111,7 @@ def sort_two_lists_2gd(values,names):
     return values, names
 
 
+#   Creating a dictionary with school name as key, with postal code and coordinates as values
 sch_data_sch_name = sch_data['school_name'].to_list()
 sch_data_pcode = sch_data['postal_code'].to_list()
 sch_data_lat = sch_data['Latitude'].to_list()
@@ -126,6 +119,8 @@ sch_data_lon = sch_data['Longitude'].to_list()
 for i in range(len(sch_data_sch_name)):
     sch_data_dict[sch_data_sch_name[i]] = [int(sch_data_pcode[i]), float(sch_data_lat[i]), float(sch_data_lon[i]),
                                            float(0),True]
+
+#   Creating a dictionary with school name as key, with CCA generic names as list
 sch_cca_names = cca_data['school_name'].to_list()
 sch_cca_ccas = cca_data['cca_generic_name'].to_list()
 sch_ccas = {}

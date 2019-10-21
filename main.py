@@ -21,7 +21,6 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.factory import Factory
 from kivy.properties import ObjectProperty
 import schoolLocations as locPin
-import pandas
 
 load_count = 0
 general_info_count = 0
@@ -30,8 +29,8 @@ favorites_dict = {}
 cca_offeredAll = {}
 ccaList = list()
 nearSchool_dict = {}
-cords = locPin.sch_data_dict
 ccas = locPin.sch_ccas
+cords = locPin.sch_data_dict        # Next three lines is for map markers
 map_layer = False
 marker_layer = MarkerMapLayer()
 predict_count = 0
@@ -89,8 +88,8 @@ infile.close
 # now, dictionary  of every CCA offered by each school is populated
 # and list of every single CCA is also made
 
-# updating main dict with distances [20] and whether is_near [21]
 def update_distances():
+    # updating main dict with distances [20] and whether is_near [21]
     for i in general_info_dict:
         if i in cords:
             general_info_dict[i][20] = cords[i][3]
@@ -99,6 +98,7 @@ def update_distances():
             general_info_dict[i][20] = 0.0
             general_info_dict[i][21] = False
 def reset_distances():
+    # resets distances of schools in main dict
     for i in general_info_dict:
         general_info_dict[i][20] = 0.0
         general_info_dict[i][21] = False
@@ -187,9 +187,6 @@ class RootWidget(AnchorLayout):
                 self.error_popup()
     # /functions used by file picker
 
-    def on_enter(self):
-        print 'on_enter'
-
     def on_load(self):
         global load_count
         if load_count == 0:
@@ -210,6 +207,7 @@ class RootWidget(AnchorLayout):
         else:
             # if distance filter is currently toggled on, clicking it again will disable all relevant controls
             # and enable other controls
+            # also resets distances to 0.0
             self.pcode.disabled = True
             self.radius.disabled = True
             self.pcode.text = ""
@@ -241,6 +239,7 @@ class RootWidget(AnchorLayout):
         self.scroll_view_load()
 
     def scroll_view_load(self):
+        # Updates mapview maplayer each time function is called
         global map_layer
         global marker_layer
         if map_layer is True:
@@ -252,6 +251,8 @@ class RootWidget(AnchorLayout):
         self.menu_scroll.clear_widgets()
         gridlayout = GridLayout(cols=1, spacing=20, size_hint_y=None)
         gridlayout.bind(minimum_height=gridlayout.setter('height'))
+        # Updates widgets (textboxes, buttons, etc)
+        # When distance filter is not active
         if not self.isnear.active:
             for key, value in sorted(general_info_dict.iteritems()):
                 if (value[16] == self.level_spinner.text or self.level_spinner.text == 'ALL') and \
@@ -277,19 +278,20 @@ class RootWidget(AnchorLayout):
                     box.add_widget(btn_view)
                     gridlayout.add_widget(box)
                     results_count += 1
+        # When distance filter is active
         elif self.isnear.active:
             # same as previous if statement, but checks for more inputs
             if len(str(self.pcode.text)) == 6 and str(self.pcode.text).isdigit() is True:
-                if self.isnear.active:
-                    correct_code = locPin.get_closest_pcode(int(self.pcode.text))
-                    self.guimap.center_on(locPin.cords_from_postal(correct_code)[0],
-                                          locPin.cords_from_postal(correct_code)[1])
-                    self.guimap.add_marker(MapMarker(lat=locPin.cords_from_postal(correct_code)[0],
-                                                     lon=locPin.cords_from_postal(correct_code)[1]))
-                    locPin.distance_calc_all(int(self.pcode.text))
+                correct_code = locPin.get_closest_pcode(int(self.pcode.text))
+                self.guimap.center_on(locPin.cords_from_postal(correct_code)[0],
+                                      locPin.cords_from_postal(correct_code)[1])
+                self.guimap.add_marker(MapMarker(lat=locPin.cords_from_postal(correct_code)[0],
+                                                 lon=locPin.cords_from_postal(correct_code)[1]))
+                locPin.distance_calc_all(int(self.pcode.text))
                 if self.radius.text != "" and self.radius.text.isdigit() is True:
                     locPin.is_it_near((float(self.radius.text)))
                     update_distances()
+                # mapview zoom based on maximum distance indicated
                 if int(self.radius.text) < 3:
                     self.guimap.zoom = 15
                 elif int(self.radius.text) < 5:
@@ -298,7 +300,7 @@ class RootWidget(AnchorLayout):
                     self.guimap.zoom = 13
                 else:
                     self.guimap.zoom = 12
-            # this loop is the same as the previous loop
+            # this loop is the same as the previous loop (when distance filter is not active)
             for key, value in sorted(general_info_dict.iteritems()):
                 if (value[16] == self.level_spinner.text or self.level_spinner.text == 'ALL') and \
                         (value[12] == self.region_spinner.text or self.region_spinner.text == 'ALL') and \
@@ -390,10 +392,8 @@ class RootWidget(AnchorLayout):
         popup.open()
 
     def showPinAndZoom(self, key, x):
-        marker = MapMarker(lat=cords[key][1], lon=cords[key][2])
         self.guimap.center_on(cords[key][1], cords[key][2])
         self.guimap.zoom = 17
-        # self.guimap.add_marker(marker) Maybe don't do this
 
     def addToFavorites(self, key, x):
         global error_msg
